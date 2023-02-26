@@ -1,0 +1,41 @@
+apply plugin: 'com.google.protobuf'
+dependencies {
+    api("com.salesforce.servicelibs:reactor-grpc:1.2.3")
+    api('com.google.protobuf:protobuf-java:3.22.0')
+    api("com.salesforce.servicelibs:reactor-grpc-stub:1.2.3")
+    api group: 'io.grpc', name: 'grpc-all', version: '1.53.0'
+    api group: 'io.grpc', name: 'grpc-protobuf', version: '1.53.0'
+    api group: 'io.grpc', name: 'grpc-stub', version: '1.53.0'
+}
+import org.apache.tools.ant.taskdefs.condition.Os
+
+
+def archSuffix = Os.isFamily(Os.FAMILY_MAC) ? ':osx-x86_64' : ''
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.20.1$archSuffix"
+    }
+
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.43.2"
+        }
+
+        reactor {
+            artifact = "com.salesforce.servicelibs:reactor-grpc:1.2.3"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "annotate_code"
+                }
+            }
+            task.plugins {
+                grpc {}
+                reactor {}
+            }
+        }
+    }
+}
