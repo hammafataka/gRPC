@@ -1,9 +1,10 @@
 package iam.mfa.grpc.client.config;
 
-import java.nio.channels.Channel;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 /**
  * @author HAMMA FATAKA (mfataka@monetplus.cz)
@@ -12,5 +13,12 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ClientConfig {
+
+    @Bean
+    public ManagedChannel channel() {
+        return ManagedChannelBuilder.forAddress("localhost", 6969)
+                .usePlaintext()
+                .build();
+    }
 
 }

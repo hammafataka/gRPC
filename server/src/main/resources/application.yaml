@@ -1,1 +1,11 @@
+server:
+  port: 6966
 
+
+grpc:
+  port: 6969
+
+
+logging:
+  config:
+    classpath: "logback.xml"
