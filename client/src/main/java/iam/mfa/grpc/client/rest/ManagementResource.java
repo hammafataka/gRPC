@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import iam.mfa.grpc.client.service.GreetingClient;
 import iam.mfa.grpc.client.service.PersonClient;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -24,8 +25,8 @@ public class ManagementResource {
     private final GreetingClient greetingClient;
 
     @GetMapping(path = "send/person/{id}")
-    public Mono<String> sendPerson(@PathVariable(name = "id") final String id) {
-        return personClient.sendPerson(id);
+    public Flux<String> sendPerson(@PathVariable(name = "id") final String id) {
+        return personClient.sendPersonWithRetry(id);
     }
 
     @GetMapping(path = "send/greeting/{id}")
