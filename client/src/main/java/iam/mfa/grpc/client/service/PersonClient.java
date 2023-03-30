@@ -15,7 +15,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 /**
  * @author HAMMA FATAKA (mfataka@monetplus.cz)
@@ -34,7 +36,7 @@ public class PersonClient {
         stub = ReactorPersonSenderGrpc.newReactorStub(channel);
     }
 
-    public Mono<String> sendPerson(String id) {
+    public Mono<String> sendPerson(final String id) {
         final var personRequest = PersonRequest.newBuilder()
                 .setId(id)
                 .setName("hamma")
@@ -46,6 +48,22 @@ public class PersonClient {
                 .map(PersonResponse::getResult)
                 .onErrorResume(error -> handleError(error, id))
                 .timeout(Duration.ofSeconds(10));
+    }
+
+    public Flux<String> sendPersonWithRetry(final String id, final int retryCount) {
+        final var personRequest = PersonRequest.newBuilder()
+                .setId(id)
+                .setName("hamma")
+                .setAge(23)
+                .setEmail("m_fataka@utb.hz")
+                .build();
+
+        return Flux.defer(() -> stub.sendPerson(personRequest)
+                        .doOnNext(personResponse -> log.trace("received person response [{}]", personResponse))
+                        .map(PersonResponse::getResult)
+                        .timeout(Duration.ofSeconds(15)))
+                .retryWhen(Retry.fixedDelay(retryCount, Duration.ofSeconds(5)))
+                .onErrorResume(error -> handleError(error, id));
     }
 
     private Mono<String> handleError(final Throwable error, final String id) {
@@ -60,7 +78,7 @@ public class PersonClient {
         return Mono.error(error);
     }
 
-    private static Mono<String> handleGrpcError(StatusRuntimeException gRPCError, String id) {
+    private static Mono<String> handleGrpcError(final StatusRuntimeException gRPCError, final String id) {
         final var errorStatus = gRPCError.getStatus();
         final var errorCode = errorStatus.getCode();
         var message = "status " + errorCode + " handling not implemented yet, message: " + errorStatus.getDescription();

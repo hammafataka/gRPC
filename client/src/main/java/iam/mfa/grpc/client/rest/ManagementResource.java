@@ -29,6 +29,11 @@ public class ManagementResource {
         return personClient.sendPerson(id);
     }
 
+    @GetMapping(path = "send/person/{id}/{retry}")
+    public Publisher<String> sendPersonWithRetry(@PathVariable(name = "id") final String id, @PathVariable(name = "retry") int retry) {
+        return personClient.sendPersonWithRetry(id, retry);
+    }
+
     @GetMapping(path = "send/greeting/{id}")
     public Mono<String> sendGreeting(@PathVariable(name = "id") final String id) {
         return greetingClient.sendGreet(id);
