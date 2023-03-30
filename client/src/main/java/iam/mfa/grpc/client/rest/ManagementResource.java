@@ -1,5 +1,6 @@
 package iam.mfa.grpc.client.rest;
 
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import iam.mfa.grpc.client.service.GreetingClient;
+import iam.mfa.grpc.client.service.PersonClient;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -19,8 +21,13 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "api/v1/management/")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ManagementResource {
+    private final PersonClient personClient;
     private final GreetingClient greetingClient;
 
+    @GetMapping(path = "send/person/{id}")
+    public Publisher<String> sendPerson(@PathVariable(name = "id") final String id) {
+        return personClient.sendPerson(id);
+    }
 
     @GetMapping(path = "send/greeting/{id}")
     public Mono<String> sendGreeting(@PathVariable(name = "id") final String id) {
