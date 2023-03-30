@@ -22,10 +22,9 @@ public class ClientConfig {
 
     @Bean
     public ManagedChannel channel() {
-        return NettyChannelBuilder.forAddress("127.0.0.1", 6969)
+        return NettyChannelBuilder.forTarget("127.0.0.1:6969")
                 .sslContext(SslUtils.buildNettyContextForClient(trustStorePath, trustStorePassword))
-                .overrideAuthority("localhost")
-                .useTransportSecurity()
+                .usePlaintext()
                 .build();
     }
 }
