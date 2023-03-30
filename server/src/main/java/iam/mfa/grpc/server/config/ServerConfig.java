@@ -1,12 +1,15 @@
 package iam.mfa.grpc.server.config;
 
+import org.lognet.springboot.grpc.GRpcServerBuilderConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import io.grpc.Server;
+import iam.mfa.grpc.utils.SslUtils;
 import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 /**
  * @author HAMMA FATAKA (mfataka@monetplus.cz)
@@ -15,11 +18,19 @@ import lombok.RequiredArgsConstructor;
  */
 @Configuration
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ServerConfig {
+public class ServerConfig extends GRpcServerBuilderConfigurer {
 
-    @Bean
-    public Server server() {
-        return ServerBuilder.forPort(6969)
-                .build();
+    @Value("${grpc.trust-store-path}")
+    private String trustStorePath;
+    @Value("${grpc.trust-store-password}")
+    private String trustStorePassword;
+
+    @Override
+    @SneakyThrows
+    public void configure(ServerBuilder<?> serverBuilder) {
+        final var builder = (NettyServerBuilder) serverBuilder;
+        final var keyManagerFactory = SslUtils.buildNettyContextForServer(trustStorePath, trustStorePassword);
+        builder.sslContext(keyManagerFactory);
+
     }
 }

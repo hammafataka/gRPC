@@ -4,6 +4,8 @@ server:
 
 grpc:
   port: 6969
+  trust-store-path: /Users/hamma/work/projects/gRPC/server/src/main/resources/server.jks
+  trust-store-password: hamma123
 
 
 logging:
