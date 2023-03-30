@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":api")
-    implementation 'org.apache.commons:commons-lang3:3.0'
+    implementation project(":common")
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
 }

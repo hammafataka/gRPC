@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import iam.mfa.grpc.client.service.GreetingClient;
-import iam.mfa.grpc.client.service.PersonClient;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -21,13 +19,8 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "api/v1/management/")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ManagementResource {
-    private final PersonClient personClient;
     private final GreetingClient greetingClient;
 
-    @GetMapping(path = "send/person/{id}")
-    public Flux<String> sendPerson(@PathVariable(name = "id") final String id) {
-        return personClient.sendPersonWithRetry(id);
-    }
 
     @GetMapping(path = "send/greeting/{id}")
     public Mono<String> sendGreeting(@PathVariable(name = "id") final String id) {

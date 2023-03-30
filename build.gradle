@@ -27,10 +27,10 @@ allprojects {
     }
 
     dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter-web:3.0.3'
-        implementation("io.projectreactor:reactor-core:3.5.3")
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation('io.projectreactor:reactor-core:3.5.4')
         implementation 'org.springframework.boot:spring-boot-starter'
-        compileOnly 'jakarta.annotation:jakarta.annotation-api:1.3.5'
+        compileOnly 'jakarta.annotation:jakarta.annotation-api:2.1.0'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'io.projectreactor:reactor-test'
 
