@@ -87,6 +87,10 @@ public class SslUtils {
 
     }
 
+    public TrustManagerFactory buildTrustManagerFactory(final String trustStorePath, final String trustStorePass) {
+        return buildTrustManagerFactory(DEFAULT_ALGORITHM, trustStorePath, trustStorePass, DEFAULT_STORE_TYPE);
+    }
+
     @SneakyThrows
     public TrustManagerFactory buildTrustManagerFactory(final String defaultAlgorithm, final String trustStorePath, final String trustStorePass, final String trustStoreType) {
         final var trustStore = buildKeyStore(trustStoreType, trustStorePath, trustStorePass);

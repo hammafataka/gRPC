@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import iam.mfa.grpc.api.data.PersonRequest;
 import iam.mfa.grpc.api.data.PersonResponse;
 import iam.mfa.grpc.api.data.ReactorPersonSenderGrpc;
+import iam.mfa.grpc.client.security.ClientBearerToken;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,8 @@ public class PersonClient {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        stub = ReactorPersonSenderGrpc.newReactorStub(channel);
+        stub = ReactorPersonSenderGrpc.newReactorStub(channel)
+                .withCallCredentials(ClientBearerToken.of());
     }
 
     public Mono<String> sendPerson(final String id) {

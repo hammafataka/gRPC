@@ -24,7 +24,8 @@ public class ClientConfig {
     public ManagedChannel channel() {
         return NettyChannelBuilder.forTarget("127.0.0.1:6969")
                 .sslContext(SslUtils.buildNettyContextForClient(trustStorePath, trustStorePassword))
-                .usePlaintext()
+                .overrideAuthority("localhost")
+                .useTransportSecurity()
                 .build();
     }
 }
