@@ -8,7 +8,6 @@ import io.grpc.*;
 import io.grpc.internal.NoopServerCall;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
  * @date 30.03.2023 22:42
  */
 @Slf4j
-@NoArgsConstructor(staticName = "of")
 public class ServerAuthenticationInterceptor implements ServerInterceptor {
     private final JwtParser jwtParser = Jwts.parserBuilder()
             .setSigningKey(SecurityConstants.JWT_SIGNING_KEY.getBytes(StandardCharsets.UTF_8))

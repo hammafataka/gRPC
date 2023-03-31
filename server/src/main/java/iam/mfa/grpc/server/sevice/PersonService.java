@@ -11,6 +11,7 @@ import iam.mfa.grpc.api.data.PersonRequest;
 import iam.mfa.grpc.api.data.PersonResponse;
 import iam.mfa.grpc.api.data.ReactorPersonSenderGrpc;
 import iam.mfa.grpc.security.SecurityConstants;
+import iam.mfa.grpc.server.interceptors.ServerAuthenticationInterceptor;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -23,7 +24,7 @@ import reactor.core.publisher.Mono;
  * @date 26.02.2023 20:36
  */
 @Slf4j
-@GRpcService
+@GRpcService(interceptors = ServerAuthenticationInterceptor.class)
 public class PersonService extends ReactorPersonSenderGrpc.PersonSenderImplBase {
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
 
