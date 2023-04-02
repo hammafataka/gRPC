@@ -9,10 +9,6 @@ import java.util.Objects;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
-import io.grpc.netty.shaded.io.netty.handler.ssl.SslContext;
-import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
-import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -28,35 +24,13 @@ public class SslUtils {
     private final String DEFAULT_ALGORITHM = "SunX509";
     private final String DEFAULT_STORE_TYPE = "JKS";
 
-
-    public SslContext buildNettyContextForServer(final String trustStorePath, final String trustStorePass) {
-        return buildNettyContext(DEFAULT_ALGORITHM, trustStorePath, trustStorePass, DEFAULT_STORE_TYPE, true);
+    public KeyManagerFactory buildKeyManagerFactory(final String keyStorePath, final String keyStorePass) {
+        return buildKeyManagerFactory(DEFAULT_ALGORITHM, keyStorePath, keyStorePass, DEFAULT_STORE_TYPE);
     }
 
-    public SslContext buildNettyContextForClient(final String trustStorePath, final String trustStorePass) {
-        return buildNettyContext(DEFAULT_ALGORITHM, trustStorePath, trustStorePass, DEFAULT_STORE_TYPE, false);
+    public TrustManagerFactory buildTrustManagerFactory(final String trustStorePath, final String trustStorePass) {
+        return buildTrustManagerFactory(DEFAULT_ALGORITHM, trustStorePath, trustStorePass, DEFAULT_STORE_TYPE);
     }
-
-    @SneakyThrows
-    public SslContext buildNettyContext(final String algorithm,
-                                        final String trustStorePath,
-                                        final String trustStorePass,
-                                        final String storeType,
-                                        final boolean isServer) {
-
-        if (isServer) {
-            final var keyManagerFactory = buildKeyManagerFactory(algorithm, trustStorePath, trustStorePass, storeType);
-            return GrpcSslContexts
-                    .configure(SslContextBuilder.forServer(keyManagerFactory), SslProvider.JDK)
-                    .build();
-        }
-        final var trustManagerFactory = buildTrustManagerFactory(algorithm, trustStorePath, trustStorePass, storeType);
-        return GrpcSslContexts
-                .configure(SslContextBuilder.forClient().trustManager(trustManagerFactory), SslProvider.JDK)
-                .build();
-
-    }
-
 
     @SneakyThrows
     public KeyStore buildKeyStore(final String keyStoreType, final String keyStorePath, final String keyStorePassword) {
@@ -73,10 +47,6 @@ public class SslUtils {
         }
     }
 
-    @SneakyThrows
-    public KeyManagerFactory buildKeyManagerFactory(final String keyStorePath, final String keyStorePass) {
-        return buildKeyManagerFactory(DEFAULT_ALGORITHM, keyStorePath, keyStorePass, DEFAULT_STORE_TYPE);
-    }
 
     @SneakyThrows
     public KeyManagerFactory buildKeyManagerFactory(final String defaultAlgorithm, final String keyStorePath, final String keyStorePass, final String keyStoreType) {
@@ -86,6 +56,7 @@ public class SslUtils {
         return keyManagerFactory;
 
     }
+
 
     @SneakyThrows
     public TrustManagerFactory buildTrustManagerFactory(final String defaultAlgorithm, final String trustStorePath, final String trustStorePass, final String trustStoreType) {
