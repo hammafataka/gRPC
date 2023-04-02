@@ -20,9 +20,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ServerConfig {
 
-    @Value("${grpc.trust-store-path}")
+    @Value("${grpc.security.key-store-path}")
     private String trustStorePath;
-    @Value("${grpc.trust-store-password}")
+    @Value("${grpc.security.key-store-password}")
     private String trustStorePassword;
 
     @Bean
