@@ -19,9 +19,9 @@ import lombok.SneakyThrows;
  */
 @Configuration
 public class ClientConfig {
-    @Value("${grpc.trust-store-path}")
+    @Value("${grpc.security.trust-store-path}")
     private String trustStorePath;
-    @Value("${grpc.trust-store-password}")
+    @Value("${grpc.security.trust-store-password}")
     private String trustStorePassword;
 
     @Bean

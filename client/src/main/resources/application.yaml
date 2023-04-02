@@ -2,8 +2,9 @@ server:
   port: 6990
 
 grpc:
-  trust-store-path: /Users/hamma/work/projects/gRPC/server/src/main/resources/server.jks
-  trust-store-password: hamma123
+  security:
+    trust-store-path: /Users/hamma/work/projects/gRPC/server/src/main/resources/server.jks
+    trust-store-password: hamma123
 
 logging:
   config: "classpath:logback.xml"
