@@ -29,7 +29,6 @@ public class PersonService extends ReactorPersonSenderGrpc.PersonSenderImplBase 
     private final LocalDateTime registrationDate = LocalDateTime.of(2023, 3, 1, 0, 0);
 
     @Override
-
     public Mono<PersonResponse> sendPerson(final Mono<PersonRequest> request) {
         return request.doOnNext(personRequest -> log.trace("Received person request [{}]", personRequest))
                 .map(personRequest -> {
