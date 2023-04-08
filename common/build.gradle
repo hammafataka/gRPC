@@ -3,9 +3,6 @@ dependencies {
     api("com.salesforce.servicelibs:reactor-grpc:1.2.3")
     api('com.google.protobuf:protobuf-java:3.22.2')
     api("com.salesforce.servicelibs:reactor-grpc-stub:1.2.3")
-    api ('io.grpc:grpc-all:1.53.0')
-    api ('io.grpc:grpc-protobuf:1.53.0')
-    api ('io.grpc:grpc-stub:1.53.0')
     api 'io.github.lognet:grpc-spring-boot-starter:5.0.0'
 
 }

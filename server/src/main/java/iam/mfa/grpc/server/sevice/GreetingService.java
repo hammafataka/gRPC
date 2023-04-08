@@ -1,10 +1,9 @@
 package iam.mfa.grpc.server.sevice;
 
-import org.lognet.springboot.grpc.GRpcService;
-
 import iam.mfa.grpc.api.data.GreetingRequest;
 import iam.mfa.grpc.api.data.GreetingResponse;
 import iam.mfa.grpc.api.data.ReactorGreetingSenderGrpc;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -14,8 +13,9 @@ import reactor.core.publisher.Mono;
  * @date 27.02.2023 0:53
  */
 @Slf4j
-@GRpcService
+@RequiredArgsConstructor
 public class GreetingService extends ReactorGreetingSenderGrpc.GreetingSenderImplBase {
+    private final String serverName;
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
 
     @Override
@@ -31,7 +31,7 @@ public class GreetingService extends ReactorGreetingSenderGrpc.GreetingSenderImp
                     }
                     return GreetingResponse.newBuilder()
                             .setResult("OK")
-                            .setResultMessage("greeting received successfully")
+                            .setResultMessage("greeting received successfully to server: " + serverName)
                             .build();
                 })
                 .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse));

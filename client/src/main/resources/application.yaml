@@ -1,5 +1,11 @@
 server:
   port: 6990
 
+
+grpc:
+  client:
+    targets: localhost:6960,localhost:6961,localhost:6962
+
+
 logging:
   config: "classpath:logback.xml"

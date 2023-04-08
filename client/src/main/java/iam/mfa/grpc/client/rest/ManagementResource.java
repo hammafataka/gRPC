@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import iam.mfa.grpc.client.service.GreetingClient;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -24,7 +25,10 @@ public class ManagementResource {
 
     @GetMapping(path = "send/greeting/{id}")
     public Mono<String> sendGreeting(@PathVariable(name = "id") final String id) {
-        return greetingClient.sendGreet(id);
+        return Flux.range(0, 3)
+                .flatMap(index -> greetingClient.sendGreet(id))
+                .collectList()
+                .map(list -> String.join(", ", list));
     }
 
 }
