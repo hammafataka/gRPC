@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import iam.mfa.grpc.client.resolvers.MultipleAddressNameResolver;
+import iam.mfa.grpc.client.resolvers.MultipleAddressNameResolverProvider;
 import io.grpc.EquivalentAddressGroup;
 import io.grpc.ManagedChannel;
 import io.grpc.NameResolverRegistry;
@@ -37,8 +37,8 @@ public class ClientConfig {
                     return new EquivalentAddressGroup(new InetSocketAddress(host, Integer.parseInt(port)));
                 })
                 .toList();
-        final var nameResolverFactory = MultipleAddressNameResolver.of(addresses);
-        NameResolverRegistry.getDefaultRegistry().register(nameResolverFactory);
+        final var multipleAddressNameResolverProvider = MultipleAddressNameResolverProvider.of(addresses);
+        NameResolverRegistry.getDefaultRegistry().register(multipleAddressNameResolverProvider);
     }
 
 

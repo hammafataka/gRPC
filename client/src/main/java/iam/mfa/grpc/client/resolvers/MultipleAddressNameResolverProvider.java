@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  * @date 07.04.2023 21:54
  */
 @RequiredArgsConstructor(staticName = "of")
-public class MultipleAddressNameResolver extends NameResolverProvider {
+public class MultipleAddressNameResolverProvider extends NameResolverProvider {
     private final List<EquivalentAddressGroup> addresses;
 
     @Override
