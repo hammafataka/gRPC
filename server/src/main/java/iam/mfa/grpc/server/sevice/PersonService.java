@@ -1,60 +1,70 @@
 package iam.mfa.grpc.server.sevice;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.lognet.springboot.grpc.GRpcService;
-
-import iam.mfa.grpc.api.data.PersonRequest;
-import iam.mfa.grpc.api.data.PersonResponse;
-import iam.mfa.grpc.api.data.ReactorPersonSenderGrpc;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
+import iam.mfa.grpc.api.rest.data.model.*;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
  * @author HAMMA FATAKA (mfataka@monetplus.cz)
  * @project gRPC
- * @date 26.02.2023 20:36
+ * @date 29.04.2023 2:15
  */
+
 @Slf4j
-@GRpcService
-public class PersonService extends ReactorPersonSenderGrpc.PersonSenderImplBase {
+public class PersonService {
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
+    private final Map<String, String> lifeInfos = new HashMap<>();
 
-    private final Map<String, PersonRequest> registeredPeople = new ConcurrentHashMap<>();
-    private final LocalDateTime registrationDate = LocalDateTime.of(2023, 3, 1, 0, 0);
-
-    @Override
-
-    public Mono<PersonResponse> sendPerson(final Mono<PersonRequest> request) {
-        return request.doOnNext(personRequest -> log.trace("Received person request [{}]", personRequest))
+    public Mono<RestResultResponse> savePerson(final RestPersonalInfo personalInfo) {
+        return Mono.fromSupplier(() -> personalInfo)
+                .doOnNext(personRequest -> log.trace("Received person request [{}]", personRequest))
                 .map(personRequest -> {
-                    final var personId = personRequest.getId();
-                    final var email = personRequest.getEmail();
-                    if (personId.contains(BLOCKED_ID_SUFFIX)) {
-                        throw new StatusRuntimeException(Status.PERMISSION_DENIED.withDescription("Person is in blocked list"));
+                    final var personRequestId = personRequest.getId();
+                    if (personRequestId.contains(BLOCKED_ID_SUFFIX)) {
+                        return RestResultResponse.builder()
+                                .result("BLOCKED")
+                                .resultMessage("person is in blocked list")
+                                .build();
                     }
-                    if (LocalDateTime.now().isAfter(registrationDate)) {
-                        throw new StatusRuntimeException(Status.DEADLINE_EXCEEDED.withDescription("registration date is already expired"));
-                    }
-                    final var existingPerson = registeredPeople.get(personId);
-                    if (Objects.nonNull(existingPerson)) {
-                        throw new StatusRuntimeException(Status.ALREADY_EXISTS.withDescription("person is already registered with id:" + personId));
-                    }
-                    if (!email.endsWith("@utb.cz")) {
-                        throw new StatusRuntimeException(Status.FAILED_PRECONDITION.withDescription("person is not from utb"));
-                    }
-                    registeredPeople.putIfAbsent(personId, personRequest);
-                    return PersonResponse.newBuilder()
-                            .setResult("OK")
-                            .setResultMessage("Person received successfully")
+                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
+                    lifeInfos.computeIfAbsent(key, s -> personRequest.getLifeIntro());
+
+                    return RestResultResponse.builder()
+                            .result("OK")
+                            .resultMessage("interesting life intro for: " + personRequest.getLifeIntro())
                             .build();
                 })
-                .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse))
-                .doOnError(error -> log.warn("error occurred, message [{}]", error.getMessage(), error));
+                .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse));
+    }
+
+    public Mono<RestResultResponse> updatePerson(final RestUpdatePersonalRequest personalRequest) {
+        return Mono.fromSupplier(() -> personalRequest)
+                .doOnNext(updatePersonalRequest -> log.trace("received personal update request [{}]", updatePersonalRequest))
+                .map(updateRequest -> {
+                    final var key = updateRequest.getName() + "-" + updateRequest.getEmail();
+                    lifeInfos.put(key, updateRequest.getLifeInfo());
+                    return RestResultResponse.builder()
+                            .result("ok")
+                            .resultMessage("updated personal info for " + updateRequest.getName())
+                            .build();
+                })
+                .doOnSuccess(resultResponse -> log.trace("update request responded with [{}]", resultResponse));
+    }
+
+    public Mono<RestPersonInfo> retrievePerson(final RestPersonRequest request) {
+        return Mono.fromSupplier(() -> request)
+                .doOnNext(personRequest -> log.trace("received retrieve person request [{}]", personRequest))
+                .map(personRequest -> {
+                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
+                    final var lifeInfo = lifeInfos.getOrDefault(key, "not found");
+                    return RestPersonInfo.builder()
+                            .name(personRequest.getName())
+                            .lifeIntro(lifeInfo)
+                            .build();
+                })
+                .doOnSuccess(resultResponse -> log.trace("retrieve request responded with [{}]", resultResponse));
     }
 }
