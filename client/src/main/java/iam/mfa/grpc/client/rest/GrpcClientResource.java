@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import iam.mfa.grpc.api.data.PersonInfo;
 import iam.mfa.grpc.api.data.ResultResponse;
-import iam.mfa.grpc.client.service.GreetingClientService;
 import iam.mfa.grpc.client.service.PersonClientService;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -22,13 +22,14 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "api/v1/grpc/client")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GrpcClientResource {
-    private final GreetingClientService greetingClientService;
     private final PersonClientService personClientService;
 
-
-    @GetMapping(path = "send/greeting/{id}")
-    public Mono<String> sendGreeting(@PathVariable(name = "id") final String id) {
-        return greetingClientService.sendGreet(id);
+    @GetMapping(path = "send/many/person/{id}")
+    public Flux<String> sendManyPerson(@PathVariable(name = "id") final String id) {
+        return Flux.range(0, 3)
+                .flatMap(index -> personClientService.sendPerson(id))
+                .map(ResultResponse::getResult)
+                .map(list -> String.join(", ", list));
     }
 
     @GetMapping(path = "send/person/{id}")

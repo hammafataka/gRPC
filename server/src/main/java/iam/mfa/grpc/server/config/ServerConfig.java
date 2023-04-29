@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.context.annotation.Configuration;
 
-import iam.mfa.grpc.server.sevice.GreetingService;
+import iam.mfa.grpc.server.sevice.grpc.PersonGrpcService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class ServerConfig {
                     executorService.submit(() -> {
                         final var server = ServerBuilder
                                 .forPort(port)
-                                .addService(new GreetingService(serverName))
+                                .addService(new PersonGrpcService(serverName))
                                 .build();
                         try {
                             server.start();

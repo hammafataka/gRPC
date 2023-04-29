@@ -3,9 +3,8 @@ package iam.mfa.grpc.server.sevice.grpc;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lognet.springboot.grpc.GRpcService;
-
 import iam.mfa.grpc.api.data.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -15,8 +14,9 @@ import reactor.core.publisher.Mono;
  * @date 25.04.2023 23:33
  */
 @Slf4j
-@GRpcService
+@RequiredArgsConstructor
 public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImplBase {
+    private final String serverName;
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
     private final Map<String, String> lifeInfos = new HashMap<>();
 
@@ -37,7 +37,7 @@ public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImp
 
                     return ResultResponse.newBuilder()
                             .setResult("OK")
-                            .setResultMessage("interesting life intro for: " + personRequest.getLifeIntro())
+                            .setResultMessage("received person successfully to server: " + serverName)
                             .build();
                 })
                 .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse));

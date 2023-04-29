@@ -46,6 +46,7 @@ public class ClientConfig {
     public ManagedChannel channel() {
         return NettyChannelBuilder.forTarget("localhost")
                 .defaultLoadBalancingPolicy("round_robin")
+                .useTransportSecurity()
                 .usePlaintext()
                 .build();
     }
