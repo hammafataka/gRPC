@@ -1,4 +1,4 @@
-package iam.mfa.grpc.server.sevice;
+package iam.mfa.grpc.server.sevice.grpc;
 
 import org.lognet.springboot.grpc.GRpcService;
 
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @GRpcService
-public class GreetingService extends ReactorGreetingSenderGrpc.GreetingSenderImplBase {
+public class GreetingGrpcService extends ReactorGreetingSenderGrpc.GreetingSenderImplBase {
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
 
     @Override
