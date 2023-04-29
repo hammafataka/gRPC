@@ -1,4 +1,4 @@
-package iam.mfa.grpc.server.sevice;
+package iam.mfa.grpc.server.sevice.grpc;
 
 import iam.mfa.grpc.api.data.GreetingRequest;
 import iam.mfa.grpc.api.data.GreetingResponse;

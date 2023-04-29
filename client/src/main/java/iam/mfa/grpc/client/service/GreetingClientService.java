@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class GreetingClient {
+public class GreetingClientService {
     private final ManagedChannel channel;
     private ReactorGreetingSenderGrpc.ReactorGreetingSenderStub stub;
 

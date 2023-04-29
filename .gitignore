@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+# hprof file
+*.hprof
+
 # BlueJ files
 *.ctxt
 
@@ -29,3 +32,6 @@ hs_err_pid*
 /build
 
 /**/build
+
+/**/out
+/**/generated
