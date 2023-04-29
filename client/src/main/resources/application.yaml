@@ -2,4 +2,4 @@ server:
   port: 6990
 
 logging:
-  config: "classpath:logback.xml"
+  config: /Users/hamma/work/projects/gRPC/client/src/main/resources/logback.xml

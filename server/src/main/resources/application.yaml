@@ -7,5 +7,4 @@ grpc:
 
 
 logging:
-  config:
-    classpath: "logback.xml"
+  config: /Users/hamma/work/projects/gRPC/server/src/main/resources/logback.xml
