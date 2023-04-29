@@ -38,7 +38,7 @@ public class PersonClientService {
                         .setEmail("mfataka@utb.cz")
                         .setLifeIntro("my name is hamma, living in zlin, studying software engineering!")
                         .build())
-                .doOnNext(personResponse -> log.trace("received greeting response [{}]", personResponse))
+                .doOnNext(personResponse -> log.trace("received person response [{}]", personResponse))
                 .timeout(Duration.ofSeconds(10));
     }
 
