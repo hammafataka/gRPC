@@ -6,21 +6,39 @@ option java_multiple_files = true;
 option java_package = "iam.mfa.grpc.api.data";
 
 
-message PersonRequest {
+message PersonalInfo {
   string id = 1;
   string name = 2;
   int32 age = 3;
   string  email = 4;
+  string lifeIntro = 5;
+}
+message UpdatePersonalRequest {
+  string name = 1;
+  int32 age = 2;
+  string  email = 3;
+  string lifeIntro = 4;
 }
 
+message PersonInfo {
+  string name = 2;
+  string lifeIntro = 5;
+}
 
-message PersonResponse{
+message PersonRequest{
+  string name = 1;
+  string email = 2;
+}
+
+message ResultResponse{
   string result = 1;
   string resultMessage = 2;
 }
 
 
-service PersonSender{
-  rpc sendPerson(PersonRequest) returns (PersonResponse);
+service PersonService{
+  rpc savePerson(PersonalInfo) returns (ResultResponse);
+  rpc updatePerson(UpdatePersonalRequest)  returns (ResultResponse);
+  rpc retrievePerson(PersonRequest) returns (PersonInfo);
 }
 
