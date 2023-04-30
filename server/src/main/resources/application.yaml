@@ -4,3 +4,19 @@ server:
 
 logging:
   config: /Users/hamma/work/projects/gRPC/server/src/main/resources/logback.xml
+
+
+spring:
+  # Database Setting
+  datasource:
+    url: jdbc:mysql://localhost:3306/grpc
+    username: root
+    password: root
+  # Database attributes
+  jpa:
+    hibernate.ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+  #spring active profile
+#  profiles:
+#    active: benchmark

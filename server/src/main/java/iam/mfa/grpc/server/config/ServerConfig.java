@@ -8,11 +8,14 @@ import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
+import iam.mfa.grpc.server.sevice.PersonService;
 import iam.mfa.grpc.server.sevice.grpc.PersonGrpcService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,7 +25,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Configuration
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ServerConfig {
+    private final PersonService personService;
 
     @PostConstruct
     public List<Server> servers() {
@@ -36,7 +41,7 @@ public class ServerConfig {
                     executorService.submit(() -> {
                         final var server = ServerBuilder
                                 .forPort(port)
-                                .addService(new PersonGrpcService(serverName))
+                                .addService(new PersonGrpcService(serverName, personService))
                                 .build();
                         try {
                             server.start();

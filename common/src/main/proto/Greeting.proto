@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package iam.mfa.grpc.api.data;
+
+option java_multiple_files = true;
+option java_package = "iam.mfa.grpc.api.data";
+
+
+message GreetingRequest {
+  string greeterName = 1;
+  int32 age = 2;
+}
+
+
+message GreetingResponse{
+  string result = 1;
+  int32 age = 2;
+
+}
+
+
+service GreetingSender{
+  rpc sendGreeting(GreetingRequest) returns (GreetingResponse);
+  rpc lotsOfResponses(GreetingRequest) returns (stream GreetingResponse);
+  rpc lotsOfGreetings(stream GreetingRequest) returns (GreetingResponse);
+  rpc bidiGreeting(stream GreetingRequest) returns (stream GreetingResponse);
+}

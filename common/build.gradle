@@ -1,9 +1,13 @@
 apply plugin: 'com.google.protobuf'
 dependencies {
-    api("com.salesforce.servicelibs:reactor-grpc:1.2.3")
-    api('com.google.protobuf:protobuf-java:3.22.2')
-    api("com.salesforce.servicelibs:reactor-grpc-stub:1.2.3")
-    api 'io.github.lognet:grpc-spring-boot-starter:5.0.0'
+    // spring managed dependencies
+    api 'org.springframework.boot:spring-boot-starter-validation'
+
+    // grpc dependencies
+    api "com.salesforce.servicelibs:reactor-grpc:$REACTOR_GRPC_VERSION"
+    api "com.google.protobuf:protobuf-java:$PROTOBUF_VERSION"
+    api "com.salesforce.servicelibs:reactor-grpc-stub:$REACTOR_GRPC_VERSION"
+    api "io.github.lognet:grpc-spring-boot-starter:$GRPC_SPRING_STARTER_VERSION"
 }
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -11,16 +15,16 @@ import org.apache.tools.ant.taskdefs.condition.Os
 def archSuffix = Os.isFamily(Os.FAMILY_MAC) ? ':osx-x86_64' : ''
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.20.1$archSuffix"
+        artifact = "com.google.protobuf:protoc:$PROTOBUF_PROTOC_VERSION$archSuffix"
     }
 
     plugins {
         grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.43.2"
+            artifact = "io.grpc:protoc-gen-grpc-java:$PROTOC_GEN_VERSION"
         }
 
         reactor {
-            artifact = "com.salesforce.servicelibs:reactor-grpc:1.2.3"
+            artifact = "com.salesforce.servicelibs:reactor-grpc:$REACTOR_GRPC_VERSION"
         }
     }
     generateProtoTasks {

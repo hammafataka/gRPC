@@ -1,9 +1,11 @@
 package iam.mfa.grpc.server.sevice.grpc;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import iam.mfa.grpc.api.data.*;
+import iam.mfa.grpc.api.data.GrpcPersonRequest;
+import iam.mfa.grpc.api.data.GrpcPersonResponse;
+import iam.mfa.grpc.api.data.GrpcRetrieveRequest;
+import iam.mfa.grpc.api.data.ReactorPersonServiceGrpc;
+import iam.mfa.grpc.server.jpa.model.Person;
+import iam.mfa.grpc.server.sevice.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -17,56 +19,39 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImplBase {
     private final String serverName;
-    private static final String BLOCKED_ID_SUFFIX = "BL-000";
-    private final Map<String, String> lifeInfos = new HashMap<>();
-
+    private final PersonService personService;
 
     @Override
-    public Mono<ResultResponse> savePerson(Mono<PersonalInfo> request) {
+    public Mono<GrpcPersonResponse> savePerson(Mono<GrpcPersonRequest> request) {
         return request.doOnNext(personRequest -> log.trace("Received person request [{}]", personRequest))
                 .map(personRequest -> {
-                    final var personRequestId = personRequest.getId();
-                    if (personRequestId.contains(BLOCKED_ID_SUFFIX)) {
-                        return ResultResponse.newBuilder()
-                                .setResult("BLOCKED")
-                                .setResultMessage("person is in blocked list")
-                                .build();
-                    }
-                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
-                    lifeInfos.computeIfAbsent(key, s -> personRequest.getLifeIntro());
-
-                    return ResultResponse.newBuilder()
-                            .setResult("OK")
-                            .setResultMessage("received person successfully to server: " + serverName)
+                    final var person = Person.fromGrpc(personRequest);
+                    return personService.savePerson(person)
+                            .toGrpc()
+                            .toBuilder()
+                            .setServerName(serverName)
                             .build();
                 })
                 .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse));
     }
 
     @Override
-    public Mono<ResultResponse> updatePerson(Mono<UpdatePersonalRequest> request) {
+    public Mono<GrpcPersonResponse> updatePerson(Mono<GrpcPersonRequest> request) {
         return request.doOnNext(updatePersonalRequest -> log.trace("received personal update request [{}]", updatePersonalRequest))
                 .map(updateRequest -> {
-                    final var key = updateRequest.getName() + "-" + updateRequest.getEmail();
-                    lifeInfos.put(key, updateRequest.getLifeIntro());
-                    return ResultResponse.newBuilder()
-                            .setResult("ok")
-                            .setResultMessage("updated personal info for " + updateRequest.getName())
-                            .build();
+                    final var person = Person.fromGrpc(updateRequest);
+                    return personService.savePerson(person).toGrpc();
                 })
                 .doOnSuccess(resultResponse -> log.trace("update request responded with [{}]", resultResponse));
     }
 
     @Override
-    public Mono<PersonInfo> retrievePerson(Mono<PersonRequest> request) {
+    public Mono<GrpcPersonResponse> retrievePerson(Mono<GrpcRetrieveRequest> request) {
         return request.doOnNext(personRequest -> log.trace("received retrieve person request [{}]", personRequest))
                 .map(personRequest -> {
-                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
-                    final var lifeInfo = lifeInfos.getOrDefault(key, "not found");
-                    return PersonInfo.newBuilder()
-                            .setName(personRequest.getName())
-                            .setLifeIntro(lifeInfo)
-                            .build();
+                    final var name = personRequest.getName();
+                    final var email = personRequest.getEmail();
+                    return personService.retrievePerson(name, email).toGrpc();
                 })
                 .doOnSuccess(resultResponse -> log.trace("retrieve request responded with [{}]", resultResponse));
     }
