@@ -21,4 +21,10 @@ public interface PersonJpaRepository extends JpaRepository<Person, UUID>, Person
 
     Person findPersonByNameAndEmail(final String name, final String email);
 
+    boolean existsByNameAndEmail(final String name, final String email);
+
+    @Override
+    default boolean personExistsByNameAndEmail(final String name, final String email) {
+        return existsByNameAndEmail(name, email);
+    }
 }

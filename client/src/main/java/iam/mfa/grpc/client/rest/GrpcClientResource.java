@@ -52,8 +52,7 @@ public class GrpcClientResource {
 
     @GetMapping(path = "send/person")
     public Mono<String> sendPerson() {
-        return personClientService.sendPerson()
-                .map(GrpcPersonResponse::toString);
+        return personClientService.sendPerson();
     }
 
     @GetMapping(path = "update/person")
