@@ -7,4 +7,4 @@ grpc:
     trust-store-password: hamma123
 
 logging:
-  config: "classpath:logback.xml"
+  config: /Users/hamma/work/projects/gRPC/client/src/main/resources/logback.xml
