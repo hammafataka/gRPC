@@ -1,14 +1,18 @@
 package iam.mfa.grpc.server.sevice.grpc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.lognet.springboot.grpc.GRpcService;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import iam.mfa.grpc.api.data.*;
+import iam.mfa.grpc.api.data.GrpcPersonRequest;
+import iam.mfa.grpc.api.data.GrpcPersonResponse;
+import iam.mfa.grpc.api.data.GrpcRetrieveRequest;
+import iam.mfa.grpc.api.data.ReactorPersonServiceGrpc;
 import iam.mfa.grpc.security.SecurityConstants;
 import iam.mfa.grpc.server.interceptors.ServerAuthenticationInterceptor;
+import iam.mfa.grpc.server.jpa.model.Person;
+import iam.mfa.grpc.server.sevice.PersonService;
 import io.grpc.Context;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -18,59 +22,39 @@ import reactor.core.publisher.Mono;
  * @date 25.04.2023 23:33
  */
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @GRpcService(interceptors = ServerAuthenticationInterceptor.class)
 public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImplBase {
-    private static final String BLOCKED_ID_SUFFIX = "BL-000";
-    private final Map<String, String> lifeInfos = new HashMap<>();
-
+    private final PersonService personService;
 
     @Override
-    public Mono<ResultResponse> savePerson(Mono<PersonalInfo> request) {
+    public Mono<GrpcPersonResponse> savePerson(Mono<GrpcPersonRequest> request) {
         final var clientId = SecurityConstants.CLIENT_ID_CONTEXT_KEY.get(Context.current());
         return request.doOnNext(personRequest -> log.trace("Received person request [{}] from client [{}]", personRequest, clientId))
                 .map(personRequest -> {
-                    final var personRequestId = personRequest.getId();
-                    if (personRequestId.contains(BLOCKED_ID_SUFFIX)) {
-                        return ResultResponse.newBuilder()
-                                .setResult("BLOCKED")
-                                .setResultMessage("person is in blocked list")
-                                .build();
-                    }
-                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
-                    lifeInfos.computeIfAbsent(key, s -> personRequest.getLifeIntro());
-
-                    return ResultResponse.newBuilder()
-                            .setResult("OK")
-                            .setResultMessage("interesting life intro for: " + personRequest.getLifeIntro())
-                            .build();
+                    final var person = Person.fromGrpc(personRequest);
+                    return personService.savePerson(person).toGrpc();
                 })
                 .doOnSuccess(personResponse -> log.trace("responded with [{}]", personResponse));
     }
 
     @Override
-    public Mono<ResultResponse> updatePerson(Mono<UpdatePersonalRequest> request) {
+    public Mono<GrpcPersonResponse> updatePerson(Mono<GrpcPersonRequest> request) {
         return request.doOnNext(updatePersonalRequest -> log.trace("received personal update request [{}]", updatePersonalRequest))
                 .map(updateRequest -> {
-                    final var key = updateRequest.getName() + "-" + updateRequest.getEmail();
-                    lifeInfos.put(key, updateRequest.getLifeIntro());
-                    return ResultResponse.newBuilder()
-                            .setResult("ok")
-                            .setResultMessage("updated personal info for " + updateRequest.getName())
-                            .build();
+                    final var person = Person.fromGrpc(updateRequest);
+                    return personService.savePerson(person).toGrpc();
                 })
                 .doOnSuccess(resultResponse -> log.trace("update request responded with [{}]", resultResponse));
     }
 
     @Override
-    public Mono<PersonInfo> retrievePerson(Mono<PersonRequest> request) {
+    public Mono<GrpcPersonResponse> retrievePerson(Mono<GrpcRetrieveRequest> request) {
         return request.doOnNext(personRequest -> log.trace("received retrieve person request [{}]", personRequest))
                 .map(personRequest -> {
-                    final var key = personRequest.getName() + "-" + personRequest.getEmail();
-                    final var lifeInfo = lifeInfos.getOrDefault(key, "not found");
-                    return PersonInfo.newBuilder()
-                            .setName(personRequest.getName())
-                            .setLifeIntro(lifeInfo)
-                            .build();
+                    final var name = personRequest.getName();
+                    final var email = personRequest.getEmail();
+                    return personService.retrievePerson(name, email).toGrpc();
                 })
                 .doOnSuccess(resultResponse -> log.trace("retrieve request responded with [{}]", resultResponse));
     }

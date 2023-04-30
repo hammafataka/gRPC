@@ -1,3 +1,9 @@
 dependencies {
     implementation project(":common")
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    runtimeOnly "mysql:mysql-connector-java:$MYSQL_CONNECTOR_VERSION"
+
+    implementation 'io.grpc:grpc-all:1.53.0'
 }
