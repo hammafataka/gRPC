@@ -22,5 +22,5 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
   #spring active profile
-  profiles:
-    active: benchmark
+#  profiles:
+#    active: benchmark

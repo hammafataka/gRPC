@@ -13,4 +13,6 @@ public interface PersonRepository {
 
 
     Person findPersonByNameAndEmail(final String name, final String email);
+
+    boolean personExistsByNameAndEmail(final String name, final String email);
 }

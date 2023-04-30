@@ -33,4 +33,9 @@ public class BenchmarkPersonRepository implements PersonRepository {
     public Person findPersonByNameAndEmail(String name, String email) {
         return dummyPerson;
     }
+
+    @Override
+    public boolean personExistsByNameAndEmail(String name, String email) {
+        return false;
+    }
 }
