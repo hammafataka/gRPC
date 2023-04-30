@@ -16,7 +16,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 /**
  * @author HAMMA FATAKA (mfataka@monetplus.cz)
@@ -47,6 +49,21 @@ public class PersonClientService {
                 .map(GrpcPersonResponse::toString)
                 .onErrorResume(error -> handleError(error, request.getName()))
                 .timeout(Duration.ofSeconds(10));
+    }
+
+    public Flux<String> sendPersonWithRetry() {
+        final var personRequest = GrpcPersonRequest.newBuilder()
+                .setName("hamma")
+                .setAge(23)
+                .setEmail("m_fataka@utb.hz")
+                .build();
+
+        return Flux.defer(() -> stub.savePerson(personRequest)
+                        .doOnNext(personResponse -> log.trace("received person response [{}]", personResponse))
+                        .map(GrpcPersonResponse::toString)
+                        .timeout(Duration.ofSeconds(10)))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(5)))
+                .onErrorResume(error -> handleError(error, personRequest.getName()));
     }
 
     public Mono<GrpcPersonResponse> updatePersonalInfo() {
