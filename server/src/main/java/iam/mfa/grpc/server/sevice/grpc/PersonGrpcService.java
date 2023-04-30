@@ -6,6 +6,9 @@ import java.util.Map;
 import org.lognet.springboot.grpc.GRpcService;
 
 import iam.mfa.grpc.api.data.*;
+import iam.mfa.grpc.security.SecurityConstants;
+import iam.mfa.grpc.server.interceptors.ServerAuthenticationInterceptor;
+import io.grpc.Context;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -15,7 +18,7 @@ import reactor.core.publisher.Mono;
  * @date 25.04.2023 23:33
  */
 @Slf4j
-@GRpcService
+@GRpcService(interceptors = ServerAuthenticationInterceptor.class)
 public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImplBase {
     private static final String BLOCKED_ID_SUFFIX = "BL-000";
     private final Map<String, String> lifeInfos = new HashMap<>();
@@ -23,7 +26,8 @@ public class PersonGrpcService extends ReactorPersonServiceGrpc.PersonServiceImp
 
     @Override
     public Mono<ResultResponse> savePerson(Mono<PersonalInfo> request) {
-        return request.doOnNext(personRequest -> log.trace("Received person request [{}]", personRequest))
+        final var clientId = SecurityConstants.CLIENT_ID_CONTEXT_KEY.get(Context.current());
+        return request.doOnNext(personRequest -> log.trace("Received person request [{}] from client [{}]", personRequest, clientId))
                 .map(personRequest -> {
                     final var personRequestId = personRequest.getId();
                     if (personRequestId.contains(BLOCKED_ID_SUFFIX)) {

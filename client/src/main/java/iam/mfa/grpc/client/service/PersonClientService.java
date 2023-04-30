@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import iam.mfa.grpc.api.data.*;
+import iam.mfa.grpc.client.security.ClientBearerToken;
 import io.grpc.ManagedChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,8 @@ public class PersonClientService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        stub = ReactorPersonServiceGrpc.newReactorStub(channel);
+        stub = ReactorPersonServiceGrpc.newReactorStub(channel)
+                .withCallCredentials(ClientBearerToken.of());
     }
 
     public Mono<ResultResponse> sendPerson(String id) {
