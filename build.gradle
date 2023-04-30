@@ -29,11 +29,13 @@ allprojects {
     }
 
     dependencies {
+        // spring managed dependencies
         implementation 'org.springframework.boot:spring-boot-starter-webflux'
         implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation('io.projectreactor:reactor-core:3.5.4')
+        implementation 'io.projectreactor:reactor-core'
         implementation 'org.springframework.boot:spring-boot-starter'
-        compileOnly 'jakarta.annotation:jakarta.annotation-api:2.1.0'
+
+        //test dependencies
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'io.projectreactor:reactor-test'
 
