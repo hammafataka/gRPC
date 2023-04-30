@@ -3,13 +3,11 @@ package iam.mfa.grpc.client.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import iam.mfa.grpc.api.data.GreetingResponse;
-import iam.mfa.grpc.api.data.PersonInfo;
-import iam.mfa.grpc.api.data.ResultResponse;
+import iam.mfa.grpc.api.data.GrpcPersonResponse;
 import iam.mfa.grpc.client.service.GreetingClientService;
 import iam.mfa.grpc.client.service.PersonClientService;
 import lombok.RequiredArgsConstructor;
@@ -52,21 +50,21 @@ public class GrpcClientResource {
                 .map(GreetingResponse::getResult);
     }
 
-    @GetMapping(path = "send/person/{id}")
-    public Mono<String> sendPerson(@PathVariable(name = "id") final String id) {
-        return personClientService.sendPerson(id)
-                .map(ResultResponse::getResultMessage);
+    @GetMapping(path = "send/person")
+    public Mono<String> sendPerson() {
+        return personClientService.sendPerson()
+                .map(GrpcPersonResponse::toString);
     }
 
-    @GetMapping(path = "update/personal")
-    public Mono<String> updatePersonal() {
+    @GetMapping(path = "update/person")
+    public Mono<String> updatePerson() {
         return personClientService.updatePersonalInfo()
-                .map(ResultResponse::getResultMessage);
+                .map(GrpcPersonResponse::toString);
     }
 
-    @GetMapping(path = "get/lifeInfo")
+    @GetMapping(path = "retrieve/")
     public Mono<String> retrievePerson() {
         return personClientService.retrievePerson()
-                .map(PersonInfo::toString);
+                .map(GrpcPersonResponse::toString);
     }
 }
